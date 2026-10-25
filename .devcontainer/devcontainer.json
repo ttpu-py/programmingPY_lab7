@@ -1,0 +1,21 @@
+{
+  "name": "Python Lab 7",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "ex1.py"
+      ]
+    },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run ex1.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex1.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex2.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex2.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex3.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex3.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex4.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex4.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex5.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex5.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex6.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex6.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex7.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex7.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Run ex8.py",
+      "type": "process",
+      "command": "python",
+      "args": ["${workspaceFolder}/ex8.py"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    }
+  ]
+}
