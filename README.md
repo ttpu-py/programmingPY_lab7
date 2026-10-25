@@ -52,39 +52,59 @@ We grade only the code on GitHub.
 
 ---
 
+## Lab Rules: Focus on Fundamentals
+
+> [!IMPORTANT]
+> **No Built-in Shortcuts Allowed!**
+>
+> Python includes high-level convenience tools like `.sort()` and `sorted()`.
+> In this lab, you are **not** allowed to use:
+> - `list.sort()` or `sorted(...)`
+> - `min(...)` or `max(...)`
+> - `list.index(...)`
+> - `reversed(...)`
+> - External sorting libraries (`heapq`, `bisect`, etc.)
+>
+> **The Goal**: As a computer scientist, you must understand what the computer does step-by-step: indices, comparisons, pointer movements, memory shifts, and recursion. You must write every loop and comparison manually.
+
+---
+
 ## Useful reminders
 
 ```python
-# Swap two items in a list
+# 1. Swapping two items in a list (Python tuple swap)
 arr[i], arr[j] = arr[j], arr[i]
 
-# Copy a list before modifying it
-my_list = numbers.copy()
+# 2. Copying a list (DO NOT write b = a; that only creates an alias!)
+arr_copy = original_list.copy()
 
-# Find the middle index of a list
+# 3. Integer division for the midpoint
 mid = len(arr) // 2
 
-# Slice a list into left and right halves
-left_half = arr[:mid]
-right_half = arr[mid:]
+# 4. Slicing a list in half
+left_half = arr[:mid]       # from index 0 to mid - 1
+right_half = arr[mid:]      # from index mid to the end
 
-# Combine two lists
-merged.extend(remaining_items)  # or: merged += remaining_items
+# 5. Short-circuit evaluation in while loops
+# ALWAYS check 'j >= 0' first!
+while j >= 0 and arr[j] > key:
+    arr[j + 1] = arr[j]
+    j -= 1
 
-# Compare strings alphabetically
-"Aziz" < "Malika"               # evaluates to True
+# 6. Comparing strings alphabetically
+"Aziz" < "Malika"           # True (A comes before M)
 
-# Access dictionary fields
+# 7. Accessing dictionary fields
 student["exam_score"]
 product["price"]
 
-# Measure execution time in seconds
+# 8. Measuring time in seconds
 import time
 start = time.perf_counter()
 # run your function here
 elapsed = time.perf_counter() - start
 
-# Import datasets from dataset.py
+# 9. Importing datasets from dataset.py
 from dataset import small_numbers, students, products
 ```
 
@@ -92,7 +112,9 @@ from dataset import small_numbers, students, products
 
 ## Exercise 1 - Bubble sort step-by-step
 
-Bubble Sort is one of the simplest sorting algorithms. It steps through a list, compares adjacent items, and swaps them if they are in the wrong order. After the first complete pass, the largest item rises ("bubbles up") to the end of the list.
+Bubble Sort is the most intuitive sorting algorithm. It makes multiple passes through a list. In each pass, it compares adjacent elements (`arr[j]` and `arr[j + 1]`). If the left item is greater than the right item, it swaps them.
+
+After the first pass, the largest number moves to the very end of the list — just like a bubble rising to the surface.
 
 The data is in `ex1.py`:
 
@@ -100,16 +122,20 @@ The data is in `ex1.py`:
 numbers = [64, 34, 25, 12, 22, 11, 90]
 ```
 
-1. Sort a copy of `numbers` in ascending order using Bubble Sort.
-2. Print the list after each complete pass (Pass 1 through Pass 6).
-3. Count how many total comparisons and swaps your code makes.
-4. Print the final sorted list and the total counts.
+1. Create a copy of `numbers` so you do not modify the original list directly: `arr = numbers.copy()`.
+2. Write Bubble Sort using two nested loops:
+   - Outer loop `i`: controls the number of passes (`0` to `len(arr) - 2`).
+   - Inner loop `j`: checks adjacent pairs (`0` to `len(arr) - 2 - i`).
+3. Inside the inner loop:
+   - Increase a `comparisons` counter by 1.
+   - If `arr[j] > arr[j + 1]`, swap them and increase a `swaps` counter by 1.
+4. After each complete outer pass, print the current state of the list.
+5. After all passes finish, print the final sorted list, the total comparisons, and total swaps.
 
 Hints:
-- Use two nested loops: an outer loop for the passes, and an inner loop for adjacent comparisons.
-- In each pass `i`, compare `arr[j]` with `arr[j + 1]`. If `arr[j] > arr[j + 1]`, swap them.
-- Swap elements cleanly using Python tuple assignment: `arr[j], arr[j + 1] = arr[j + 1], arr[j]`.
-- Notice that after pass `i`, the largest `i` items are already in their final places. The inner loop only needs to check up to `len(arr) - 1 - i`.
+- **Avoiding IndexError**: If a list has length 7, the highest index is 6. If `j` reached 6, checking `arr[j + 1]` (index 7) would crash with an `IndexError`. That is why the inner loop range stops at `len(arr) - 1 - i`.
+- **Why `- i`?**: After pass 0, the 1 largest item is placed. After pass 1, the 2 largest items are placed. You do not need to re-check the end of the list!
+- Remember: **Do not use `.sort()` or `sorted()`**.
 
 Output:
 
@@ -132,7 +158,10 @@ Total swaps: 14
 
 ## Exercise 2 - Optimized bubble sort (early exit)
 
-A standard Bubble Sort always executes all $n - 1$ passes, even if the list becomes sorted after just one or two passes. We can optimize it by tracking whether any swap occurred during a pass. If no items were swapped, the list is already sorted, and we can stop immediately!
+Notice in Exercise 1 that after Pass 5, the list was already sorted: `[11, 12, 22, 25, 34, 64, 90]`. Yet Pass 6 still ran and made comparisons without swapping anything!
+
+Standard Bubble Sort is slow because it always performs all $n - 1$ passes. We can optimize it with a boolean flag:
+If a full pass completes with **zero swaps**, the list is already sorted! We can stop immediately with `break`.
 
 The data is in `ex2.py`:
 
@@ -141,15 +170,17 @@ nearly_sorted = [10, 20, 25, 30, 50, 40, 60, 70]
 already_sorted = [5, 15, 25, 35, 45, 55]
 ```
 
-1. Implement an optimized Bubble Sort that uses a boolean variable `swapped`.
-2. Test your algorithm on `nearly_sorted`. Print the list after each pass, and print a message when an early stop occurs.
-3. Test your algorithm on `already_sorted`. Show that it stops after only 1 pass.
-4. For each test, print how many passes were executed compared to how many passes a standard Bubble Sort would need.
+1. Implement an optimized Bubble Sort function or loop structure using a boolean flag `swapped`.
+2. Test on `nearly_sorted`:
+   - Set `swapped = False` before starting each pass.
+   - If any swap occurs during the pass, set `swapped = True`.
+   - At the end of the pass, if `swapped` is still `False`, print `(no swaps, stopping early!)` and `break`.
+3. Test on `already_sorted`: verify that your code executes only 1 pass and stops.
+4. For both tests, print how many passes your code ran compared to a standard unoptimized sort ($n - 1$ passes).
 
 Hints:
-- Set `swapped = False` before each pass starts.
-- When a swap happens, change `swapped = True`.
-- At the end of each pass, check `if not swapped:`. If `swapped` is `False`, break out of the outer loop.
+- Place `swapped = False` right inside the outer loop, before the inner loop begins.
+- If no elements are swapped throughout the entire inner loop, `if not swapped:` triggers the `break`.
 
 Output:
 
@@ -172,7 +203,11 @@ Sorted list: [5, 15, 25, 35, 45, 55]
 
 ## Exercise 3 - Insertion sort step-by-step
 
-Insertion Sort builds a sorted list one item at a time. It works like sorting playing cards in your hand: you divide your list into a sorted section on the left and an unsorted section on the right. For each unsorted item, you pick it up (`key`), shift all larger items one position to the right, and insert the `key` into its correct spot.
+Insertion Sort works like sorting cards in your hands. You maintain two portions in the list:
+- A **sorted portion** on the left.
+- An **unsorted portion** on the right.
+
+At each step, you pick the next unsorted card (the `key`), shift all elements in the sorted portion that are larger than `key` one position to the right, and insert `key` into the vacated space.
 
 The data is in `ex3.py`:
 
@@ -180,19 +215,20 @@ The data is in `ex3.py`:
 numbers = [29, 10, 14, 37, 13]
 ```
 
-1. Sort a copy of `numbers` in ascending order using Insertion Sort.
-2. Start your outer loop from index `1` up to the end of the list.
-3. In each step:
-   - Save the current value into a variable named `key`.
-   - Use a `while` loop to shift all elements greater than `key` one position to the right.
-   - Insert `key` at the correct index.
-4. Print the list and the value of `key` after each insertion step.
-5. Count and print the total number of shifts made.
+1. Start your outer loop from index `1` up to `len(numbers) - 1` (an initial list of 1 element at index 0 is already sorted by definition!).
+2. In each iteration `i`:
+   - Store the current item in a temporary variable: `key = arr[i]`.
+   - Set pointer `j = i - 1`.
+   - Use a `while` loop to shift elements to the right as long as `j >= 0` and `arr[j] > key`.
+   - Shift an element: `arr[j + 1] = arr[j]`. Increment a `shifts` counter. Decrement `j -= 1`.
+   - Once the while loop stops, insert the key: `arr[j + 1] = key`.
+3. Print the list and the inserted key after each step.
+4. Print the final sorted list and the total number of shifts.
 
 Hints:
-- To shift elements, set `j = i - 1`. While `j >= 0` and `arr[j] > key`: copy `arr[j]` to `arr[j + 1]`, increase your shift count by 1, and decrement `j -= 1`.
-- Place `key` with `arr[j + 1] = key`.
-- An element of 1 item (at index 0) is already considered sorted, which is why the outer loop begins at index 1.
+- **Crucial Python Trait (Short-circuit Evaluation)**:
+  Always write `while j >= 0 and arr[j] > key:` — NEVER `while arr[j] > key and j >= 0:`.
+  If `j` reaches `-1`, Python checks `j >= 0` first, evaluates to `False`, and stops. If you checked `arr[j]` first, Python would access `arr[-1]` (the last element of the list!) and create bugs.
 
 Output:
 
@@ -212,7 +248,9 @@ Total shifts: 5
 
 ## Exercise 4 - Insertion sort with strings
 
-Sorting algorithms work on text and words just like they work on numbers! In Python, strings are compared alphabetically. Insertion Sort is especially useful when you need to maintain an already sorted list as new elements arrive.
+Sorting algorithms are general: they work on text just as well as numbers! Python compares strings in alphabetical (lexicographical) order (`"Aziz" < "Malika"` is `True`).
+
+Insertion Sort has a major real-world superpower: **online sorting**. If you already have a sorted list and one new item arrives, you can insert it into its exact position in $O(n)$ time without re-sorting the whole list!
 
 The data is in `ex4.py`:
 
@@ -221,14 +259,16 @@ names = ["Sardor", "Malika", "Aziz", "Dilnoza", "Jasur", "Kamola"]
 new_student = "Bekzod"
 ```
 
-1. Sort `names` alphabetically in **ascending order** (A to Z) using Insertion Sort. Print the sorted list.
-2. Sort a copy of `names` in **descending order** (Z to A) using Insertion Sort. Print the descending list.
-3. Imagine a new student joins the class: add `new_student = "Bekzod"` to the ascending sorted roster. Insert `"Bekzod"` into its correct alphabetical position in **one single insertion pass**, without re-sorting the whole list. Print the updated roster.
+1. Sort `names` alphabetically in **ascending order** (A to Z) using Insertion Sort. Print the sorted roster.
+2. Sort a fresh copy of `names` in **descending order** (Z to A) using Insertion Sort. Print the descending roster.
+3. A new student `"Bekzod"` joins the class:
+   - Add `"Bekzod"` to the end of your ascending sorted roster: `names.append(new_student)`.
+   - Run a single insertion step starting from the last element (`key = names[-1]`, `j = len(names) - 2`) to shift items and place `"Bekzod"` where it belongs.
+   - Print the updated roster.
 
 Hints:
-- In Python, string comparisons like `"Aziz" < "Dilnoza"` evaluate to `True`.
-- For descending order, change the comparison inside the `while` loop: shift elements when `arr[j] < key`.
-- For step 3, append `"Bekzod"` to the end of the list with `.append()`, then run your `while` shift loop once starting from the last index (`len(arr) - 1`).
+- For descending order, change the shift condition from `arr[j] > key` to `arr[j] < key`.
+- For step 3: **Do not call `.sort()` or sort the whole list from scratch!** Use the while-loop shift logic once on the last item.
 
 Output:
 
@@ -250,9 +290,11 @@ Updated roster (A-Z):
 
 ## Exercise 5 - Merge sort: The merge step
 
-Merge Sort is a **divide-and-conquer** algorithm. Before writing the full recursive algorithm, master its most important building block: the `merge(left, right)` function.
+Merge Sort is a **divide-and-conquer** algorithm. It works in two phases:
+1. Divide the list into smaller halves until each sublist has 1 item.
+2. Merge the sorted sublists back together.
 
-The function takes two lists that are **already sorted** and combines them into one sorted list.
+Before touching recursion, master the most crucial part: the **two-pointer merge function**. This function takes two lists that are **already sorted** and combines them into one sorted list.
 
 The data is in `ex5.py`:
 
@@ -262,17 +304,27 @@ list_b = [2, 8, 18, 20, 25]
 ```
 
 1. Write a function `merge(left, right)`:
-   - Create an empty list `merged = []`.
-   - Maintain two pointers: `i = 0` for `left`, and `j = 0` for `right`.
-   - While `i < len(left)` and `j < len(right)`: compare `left[i]` and `right[j]`. Append the smaller item to `merged` and advance that pointer by 1.
-   - After the loop, append any remaining items from `left` and `right`.
+   - Create an empty list: `merged = []`.
+   - Use two pointer indices: `i = 0` (for `left`) and `j = 0` (for `right`).
+   - While `i < len(left)` and `j < len(right)`:
+     - Compare `left[i]` and `right[j]`.
+     - Append the smaller item to `merged` and advance that pointer by 1 (`i += 1` or `j += 1`).
+   - After the loop finishes, one list still has leftover elements. Append all remaining elements to `merged`:
+     ```python
+     while i < len(left):
+         merged.append(left[i])
+         i += 1
+     while j < len(right):
+         merged.append(right[j])
+         j += 1
+     ```
    - Return `merged`.
-2. Test `merge(list_a, list_b)` and print the merged result.
-3. Test edge case behavior by merging an empty list with `[1, 2, 3]`.
+2. Test `merge(list_a, list_b)` and print the result.
+3. Test edge-case behavior by merging an empty list `[]` with `[1, 2, 3]`.
 
 Hints:
-- Use `merged.extend(left[i:])` to append all leftover elements from `left` when `right` is exhausted.
-- Do not use Python's built-in `sorted()` or `.sort()` — write the pointer comparison logic manually.
+- Notice how the two pointers move independently like two fingers walking through two decks of cards.
+- You can also append leftovers with `merged.extend(left[i:])` and `merged.extend(right[j:])`.
 
 Output:
 
@@ -291,12 +343,11 @@ Merged with empty: [1, 2, 3]
 
 ## Exercise 6 - Full merge sort implementation
 
-Now complete the full Merge Sort algorithm using recursion.
+Now complete the recursive Merge Sort algorithm.
 
-Merge Sort follows three steps:
-1. **Divide**: Find the midpoint `mid = len(arr) // 2`. Split the list into `left = arr[:mid]` and `right = arr[mid:]`.
-2. **Conquer**: Recursively call `merge_sort()` on both halves until each sublist has 1 or 0 elements (**base case**).
-3. **Combine**: Call `merge(sorted_left, sorted_right)` to combine the sorted halves.
+Recursion means a function calls itself to solve smaller pieces of the same problem. Every recursive function needs two things:
+1. **Base Case**: A condition to stop recursion. A list with 0 or 1 element is already sorted.
+2. **Recursive Step**: Split the list in half, recursively sort each half, and merge them with `merge()`.
 
 The data is in `ex6.py`:
 
@@ -304,15 +355,18 @@ The data is in `ex6.py`:
 numbers = [38, 27, 43, 3, 9, 82, 10]
 ```
 
-1. Write `merge_sort(arr)` using recursion.
-2. Define the base case: `if len(arr) <= 1: return arr`.
-3. Add print statements to trace the divide and merge steps so you can observe the recursion in action.
-4. Sort `numbers` and print the final sorted list.
+1. Write `merge_sort(arr)`:
+   - Base case: `if len(arr) <= 1: return arr`.
+   - Find the midpoint: `mid = len(arr) // 2`.
+   - Divide: `left = arr[:mid]` and `right = arr[mid:]`.
+   - Conquer: `sorted_left = merge_sort(left)` and `sorted_right = merge_sort(right)`.
+   - Combine: `return merge(sorted_left, sorted_right)` (use your function from Exercise 5).
+2. Add print statements before dividing and after merging to trace how the list splits and recombines.
+3. Call `merge_sort(numbers)` and print the final sorted list.
 
 Hints:
-- Integer division `//` gives an integer midpoint index.
-- Slicing `arr[:mid]` takes elements from index 0 to `mid - 1`. Slicing `arr[mid:]` takes elements from `mid` to the end.
-- Unlike Bubble Sort and Insertion Sort which sort lists in place, Merge Sort produces and returns a new sorted list.
+- Integer division `//` ensures you get a valid whole number index for `mid`.
+- Unlike Bubble Sort and Insertion Sort (which modify the list in place), Merge Sort creates and returns new sorted lists.
 
 Output:
 
@@ -339,9 +393,8 @@ Final sorted list: [3, 9, 10, 27, 38, 43, 82]
 
 ## Exercise 7 - Comparing sorting performance
 
-Why do we study different sorting algorithms? On small lists, the difference in execution speed is unnoticeable. But as data grows, the choice of algorithm becomes critical!
-
-In this exercise, you compare **Bubble Sort**, **Insertion Sort**, and **Merge Sort** across different input sizes and orderings.
+Why learn multiple sorting algorithms?
+On 10 elements, any algorithm finishes in a fraction of a millisecond. But in industry, programs process millions of records. The difference between an $O(n^2)$ algorithm and an $O(n \log n)$ algorithm is the difference between waiting **10 hours** and waiting **3 seconds**!
 
 Import the datasets in `ex7.py`:
 
@@ -349,20 +402,18 @@ Import the datasets in `ex7.py`:
 from dataset import small_benchmark_list, large_sorted_numbers, large_unsorted_numbers
 ```
 
-1. **Test 1 - Comparisons on small data**: Count how many element comparisons each algorithm makes when sorting `small_benchmark_list` (20 elements).
-2. **Test 2 - Runtime on large unsorted data**: Measure the execution time in seconds (`time.perf_counter()`) for each algorithm on `large_unsorted_numbers` (2,000 elements).
-3. **Test 3 - Best-case behavior**: Measure execution time on `large_sorted_numbers` (2,000 elements) for optimized Bubble Sort, Insertion Sort, and Merge Sort.
-4. Print the comparison results and a brief 3-point conclusion.
+1. **Test 1 - Counting comparisons on small data (20 elements)**:
+   Sort `small_benchmark_list` (20 elements). Count how many comparisons Bubble Sort makes vs. Insertion Sort vs. Merge Sort.
+2. **Test 2 - Measuring time on large unsorted data (2,000 elements)**:
+   Measure the elapsed time in seconds (`time.perf_counter()`) for Bubble Sort, Insertion Sort, and Merge Sort on `large_unsorted_numbers`.
+3. **Test 3 - Best-case performance on sorted data (2,000 elements)**:
+   Measure the elapsed time on `large_sorted_numbers` for optimized Bubble Sort, Insertion Sort, and Merge Sort.
+4. Print the comparison table and a short conclusion.
 
 Hints:
-- Always make a copy of your test list before sorting: `test_data = data.copy()`. If you do not copy it, the first algorithm will sort it in place, leaving already sorted data for the next algorithm!
-- Record elapsed time:
-  ```python
-  start = time.perf_counter()
-  my_sort(test_data)
-  elapsed = time.perf_counter() - start
-  ```
-- Bubble Sort and Insertion Sort have quadratic complexity ($O(n^2)$) on unsorted data, while Merge Sort has linearithmic complexity ($O(n \log n)$).
+- **Always copy the list**:
+  `test_list = large_unsorted_numbers.copy()`. If you do not copy, the first algorithm sorts the list, and subsequent algorithms will mistakenly test on already sorted data!
+- For counting comparisons in Merge Sort: count comparisons inside the `while i < len(left) and j < len(right):` loop of `merge()`.
 
 Output:
 
@@ -383,16 +434,16 @@ Insertion Sort:   ~0.0003 seconds
 Merge Sort:       ~0.0030 seconds
 
 Conclusion:
-1. Merge Sort is significantly faster on large unsorted data (O(n log n) vs O(n^2)).
-2. Insertion Sort and Optimized Bubble Sort are extremely fast on already-sorted data (O(n)).
-3. Bubble Sort is simple to understand, but inefficient for large real-world collections.
+1. Merge Sort is roughly 50x faster on large unsorted data (O(n log n) vs O(n^2)).
+2. Insertion Sort and Optimized Bubble Sort beat Merge Sort on already-sorted data (O(n)).
+3. Never use unoptimized Bubble Sort on large collections.
 ```
 
 ---
 
 ## Exercise 8 - Sorting real-world records
 
-In practical software engineering, you rarely sort plain numbers. Most data consists of dictionaries, records, or objects. You must be able to sort by different fields and in different directions (ascending vs. descending).
+In practical software, data is stored in dictionaries or objects. You frequently need to sort records by specific keys (e.g., student score, GPA, or product price).
 
 Import the datasets in `ex8.py`:
 
@@ -411,18 +462,18 @@ Sample product record:
 ```
 
 1. **Rank students by exam score**:
-   Sort `students` in **descending order** (highest score first) using **Insertion Sort** based on `student["exam_score"]`. Print the top 3 students.
+   Sort a copy of `students` in **descending order** (highest score first) using **Insertion Sort** based on `student["exam_score"]`. Print the top 3 students.
 2. **Sort students alphabetically**:
-   Sort `students` in **ascending order** by `student["name"]` using **Bubble Sort**. Print all student names and their groups.
-3. **Find the cheapest products**:
-   Sort `products` in **ascending order** by `product["price"]` using **Merge Sort**. Print the 3 cheapest products.
-4. **Stable sort check**:
-   In `students`, both Kamola and Madina have an exam score of `88`. Notice that their original relative order was preserved after sorting.
+   Sort a copy of `students` in **ascending order** by `student["name"]` using **Bubble Sort**. Print all 10 students.
+3. **Find cheapest products**:
+   Sort a copy of `products` in **ascending order** by `product["price"]` using **Merge Sort**. Print the 3 cheapest products.
+4. **Observe stability**:
+   Both Kamola and Madina have an exam score of `88`. In the original list, Kamola appears before Madina. Verify that Kamola still appears before Madina in the ranked output. (A sort that preserves the relative order of equal items is called a **stable sort**).
 
 Hints:
-- When comparing records, compare the specific dictionary key: `arr[j]["exam_score"] < key["exam_score"]`.
-- Swap or shift the **entire dictionary**, not just the score!
-- For stable sorting with Insertion Sort, use `<` (strictly less than) rather than `<=` so items with equal scores stay in their original relative positions.
+- **Major Pitfall**: Compare the dictionary field (`arr[j]["exam_score"] < key["exam_score"]`), but swap or shift the **entire dictionary** (`arr[j + 1] = arr[j]`), not just the score! If you swap only the score, you corrupt student records!
+- To sort in descending order with Insertion Sort, shift elements when `arr[j]["exam_score"] < key["exam_score"]`.
+- To preserve stability, use strictly less than `<` instead of `<=`.
 
 Output:
 
